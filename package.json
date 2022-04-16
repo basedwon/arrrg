@@ -1,7 +1,7 @@
 {
   "name": "arrrg",
   "description": "a simple CLI arrrgument parser.",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "main": "arrrg.js",
   "repository": "basedwon/arrrg",
   "scripts": {},
