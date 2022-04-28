@@ -1,7 +1,10 @@
-module.exports = function arrrg(opts = [], examples, argv = process.argv.slice(2)) {
+const log = console.log.bind(console)
+module.exports = function Arrrg(opts = [], defaults = {}, examples, argv = process.argv.slice(2)) {
   if (opts.filter(opt => opt.command).length > 1)
     throw new Error(`More than one "command" option is not allowed`)
   const res = { _: [] }
+  const swaps = []
+  const options = {}
   // parse opts/aliases
   const cmds = {}
   const ops = {}
@@ -10,8 +13,11 @@ module.exports = function arrrg(opts = [], examples, argv = process.argv.slice(2
     if (!opt.name)
       throw new Error(`name is required`)
     ops[opt.name] = cmds[opt.name] = opt
+    if (opt.swap)
+      swaps.push([opt.name, opt.swap])
     if (opt.command) {
       cmd = opt.name
+      options.anon = typeof opt.anon !== 'undefined' ? opt.anon : true
       if (opt.aliases)
         throw new Error(`main command should not have aliases`)
       continue
@@ -39,7 +45,7 @@ module.exports = function arrrg(opts = [], examples, argv = process.argv.slice(2
         const op = ops[curr]
         if (!op)
           res._.push(arg)
-        else if (res[curr].length && !op.spaces)
+        else if (res[curr].length && !op.array)
           orphans.push(arg)
         else
           res[curr].push(arg)
@@ -55,20 +61,30 @@ module.exports = function arrrg(opts = [], examples, argv = process.argv.slice(2
     }
     const op = ops[key]
     const { type } = op
-    let val = res[key]
-    val = val.join(' ')
-    if (type === Boolean)
-      val = true
-    if (type && typeof type === 'function')
-      val = type(val)
-    result[op.name] = val
+    result[op.name] = res[key].join(' ')
   }
   // set defaults
   for (const key in cmds) {
     const op = cmds[key]
-    if ((typeof op.default !== 'undefined') && (typeof result[key] === 'undefined' || result[key] === ''))
-      result[key] = op.default
+    const { type } = op
+    if (typeof defaults[key] !== 'undefined')
+      op.default = defaults[key]
+    let val = result[key]
+    if ((typeof op.default !== 'undefined') && (typeof val === 'undefined' || val == ''))
+      val = op.default
+    if (val == '' && type != String)
+      val = true
+    if (type && typeof type === 'function' && val !== null && !op.array)
+      val = type(val)
+    result[key] = val
   }
+  // do swaps & final options (from command opt)
+  for (let [from, to] of swaps) {
+    result[to] = result[from]
+    delete result[from]
+  }
+  if (!options.anon)
+    delete result._
   // define help fn
   const showHelp = () => {
     const help = {}

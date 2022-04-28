@@ -10,28 +10,32 @@ npm install arrrg
 
 ## Usage
 
-`arrrg(definition, [examples], [argv])`
+`arrrg(definition, [defaults], [examples], [argv])`
 
 ## Example
 
 ```js
-const arrrg = require('arrrg')
+const Arrrg = require('arrrg')
 
 const definition = [
-  { name: 'servn', type: String, command: true, default: '.' },
+  { name: 'servn', type: String, command: true, default: '.', swap: 'docroot' },
   { name: 'host', type: String, help: 'define the host', default: 'localhost' },
   { name: 'file', type: String, aliases: ['f'], help: 'define the file', default: 'main.js' },
   { name: 'port', type: Number, aliases: ['p'], help: 'define the port', default: 8080 },
   { name: 'cert', help: 'define the TLS cert' },
   { name: 'help', type: Boolean, aliases: ['h', 'help'], help: 'show this dialog' },
 ]
+const defaults = {
+  host: 'localhost',
+  file: 'main.js'
+}
 const examples = [
   `servn`,
   `servn -p 3000`,
   `servn ~/project --host example.com --file index.js`,
 ]
 const argv = ['.', '--cert', 'localhost-key.pem', '--help']
-const opts = arrrg(definition, examples, argv)
+const opts = Arrrg(definition, defaults, examples, argv)
 
 console.log(opts)
 /*

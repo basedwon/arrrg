@@ -4,6 +4,39 @@
   "version": "0.0.2",
   "main": "arrrg.js",
   "repository": "basedwon/arrrg",
-  "scripts": {},
-  "dependencies": {}
+  "jest": {
+    "testEnvironment": "node"
+  },
+  "nodemonConfig": {
+    "restartable": "rs",
+    "env": {
+      "NODE_ENV": "development"
+    },
+    "watch": [
+      "*"
+    ],
+    "ignore": [
+      "**/*.test.js",
+      "**/*.spec.js",
+      ".git",
+      "node_modules"
+    ]
+  },
+  "scripts": {
+    "dev": "nodemon",
+    "dev:watch": "nodemon --exec \"npm run lint && npm run test\"",
+    "dev:test": "nodemon --exec \"npm run lint && npm run test && node .\"",
+    "test": "jest",
+    "test:watch": "jest --watchAll",
+    "lint": "eslint .",
+    "start": "node ."
+  },
+  "dependencies": {},
+  "devDependencies": {
+    "eslint": "^8.13.0",
+    "eslint-plugin-jest": "^26.1.4",
+    "jest": "^27.5.1",
+    "nodemon": "^2.0.15"
+  },
+  "keywords": []
 }
